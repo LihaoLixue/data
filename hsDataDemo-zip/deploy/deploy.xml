@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<deploy type="" centralizedCfg="false">
+
+	<basic describe="基本信息">
+		<!--系统类型、 应用默认分组(英文) 、服务标识、 发布包说明、发布包版本、改-->
+		<packType describe="包类型" options="pack:全量包;patch:补丁包">pack</packType>
+		<systemType describe="系统类型">jrescloud</systemType>
+	<group describe="应用默认分组(英文)">bdata</group>
+		<appType describe="服务标识">hsDataDemo-service</appType>
+		<appName describe="服务别名">德勤主体数据缺失需求</appName> <!--应用名称-->
+		<appDescribe describe="发布包说明">德勤主体数据缺失需求发布包</appDescribe> <!--发布物描述-->
+		<version describe="发布包版本">1.2-Alpha-20211116</version> <!--应用、发布物版本-->
+		<packInEffect describe="影响的主包（只有补丁需要配置，填写主包的版本号）"></packInEffect>
+	</basic>
+
+	<!-- 全系统全局参数配置，参数可以包括input(输入框)、select(单选框)、password(密码框)、mselect(多选框)、
+	grid(表格)、hidden(隐藏域) editor(编辑框)-->
+	<globalConfig describe="系统全局配置">
+		<variables describe="集群基本参数">
+				<field name="user" label="运行用户" type="input"  required="true" tooltip="当前运行该项目的用户">root</field>
+				<field name="workspace" label="安装目录" type="input"  tooltip="请正确设置安装路径">/opt/hsDataDemo</field>   <!-- 改 -->
+				<field name="jvm_args" label="jvm运行参数" type="input" required="true">-Xms1024m -Xmx1024m</field>
+				<field name="log_level" label="日志级别" type="select" options="error:error;warn:warn;info:info;fatal:fatal;debug:debug" required="true">info</field>
+				<field name="log4j2_args" label="log4j2运行参数" type="hidden" required="true">-DAsyncLogger.RingBufferSize=262144 -DAsyncLoggerConfig.RingBufferSize=262144 -Dlog4j2.AsyncQueueFullPolicy=Discard</field>
+				<field name="log_pattern" label="日志样式" type="hidden" required="true">%d{yyyy-MM-dd HH:mm:ss.SSS} |-%-5level [%thread] %c [%L] -| %msg%n</field>
+				<field name="file_pattern" label="日志文件样式" type="hidden" required="true">$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz</field>
+		</variables>
+	</globalConfig>
+
+	<!-- 配置系统包含的部署集群、分片、分布式框架等 -->
+	<subSystems describe="子系统集合">
+		<system id="hsDataDemo-service" mode="cluster" dependsOn="" type="jar" name="hsDataDemo-service集群配置">
+			<repository></repository>
+<!--			<services>-->
+<!--				<service type="ZooKeeper" matcher="single"/>-->
+<!--			</services>-->
+			<scale maxSize="20" minSize="1" describe="集群规模"></scale>
+			<scripts describe="集群脚本集">
+				<!--以下的路径都是相对于./$workspace/tmp目录下的路径，运行时真正运行脚本的位置 -->
+				<script name="beforeInstall" path="./${appType}/scripts/beforeInstall.sh" describe="预处理" />
+				<script name="install" path="./${appType}/scripts/install.sh" describe="部署" />
+				<script name="afterInstall" path="./${appType}/scripts/afterInstall.sh" describe="部署后置处理" />
+				<script name="start" path="./${appType}/scripts/start.sh" describe="启动" />
+				<script name="validateStart" path="./${appType}/scripts/validateStart.sh" describe="启动状态检测" />
+				<script name="stop" path="./${appType}/scripts/stop.sh" describe="停止" />
+				<script name="validateStop" path="./${appType}/scripts/validateStop.sh" describe="停止状态监测" />
+				<script name="uninstall" path="./${appType}/scripts/uninstall.sh" describe="卸载" />
+			</scripts>
+<!--			<variables describe="子系统参数配置">-->
+<!--				<field name="app_host" label="注册网卡" tooltip="默认*表示使用第一块网卡注册ZK。该配置项要求精确到网卡最小范围或网卡IP，如192.168.100.*或192.168.100.102" type="input" required="true">*</field>-->
+<!--				<field name="app_server_port" label="应用端口" type="input" required="true">9080</field>-->
+<!--				<field name="rpc_protocol_name" label="rpc协议" type="input" required="true">t2</field>-->
+<!--				<field name="rpc_protocol_port" label="rpc服务端口" type="input" required="true">12300</field>-->
+<!--				<field name="rpc_protocol_corethreads" label="核心处理线程数" type="input" required="true">300</field>-->
+<!--				<field name="rpc_protocol_threads" label="最大处理线程数" type="input" required="true">500</field>-->
+<!--				<field name="rpc_protocol_alive" label="处理线程空闲时长（毫秒）" type="input" required="true">60000</field>-->
+<!--				<field name="rpc_protocol_queues" label="处理队列长度" type="input" required="true">1000</field>-->
+<!--			</variables>-->
+<!--			<databases>-->
+<!--                &lt;!&ndash; 服务依赖数据库初始化SQL脚本配置，实现数据库的初始化与升级。节点指定的id为demo-database，则可将该数据库的初始化脚本放置到zip包的sqls/demo-database/目录之下，应用部署时，先执行SQL脚本的初始化&ndash;&gt;-->
+<!--                <database type="mysql" host="" port="3306" user="" password="" database="rpc_demo" id="demo-database"></database>-->
+<!--            </databases>-->
+            <configs>
+				<!--以下config主要是用于模板变量替换，template配置的路径对应的是deploy/template目录，如果没有它也会自动查找，path配置的路径对应于workspace路径 -->
+				<config path="./${appType}/config/application.properties" encoding="UTF-8" template="./application.properties"/>
+				<config path="./${appType}/config/middleware.properties" encoding="UTF-8" template="./middleware.properties"/>
+				<config path="./${appType}/config/log4j2.xml" encoding="UTF-8" template="./log4j2.xml"/>
+
+				<config path="./${appType}/scripts/beforeInstall.sh" encoding="UTF-8"/>
+				<config path="./${appType}/scripts/install.sh" encoding="UTF-8"/>
+				<config path="./${appType}/scripts/uninstall.sh" encoding="UTF-8"/>
+				<config path="./${appType}/scripts/afterInstall.sh" encoding="UTF-8"/>
+				<config path="./${appType}/scripts/start.sh" encoding="UTF-8"/>
+				<config path="./${appType}/scripts/stop.sh" encoding="UTF-8"/>
+				<config path="./${appType}/scripts/validateStart.sh" encoding="UTF-8"/>
+				<config path="./${appType}/scripts/validateStop.sh" encoding="UTF-8"/>
+			</configs>
+<!--			<variables describe="分片基本参数">-->
+<!--				&lt;!&ndash; 顶点网关配置 &ndash;&gt;-->
+<!--				<field label="顶点网关配置" type="division" fold="true">-->
+<!--					<field name="dd_service_name" label="网关名称" type="input" required="true">test_dd_financefix</field>-->
+<!--				</field>-->
+<!--			</variables>-->
+			<node describe="节点私有配置信息"/>
+		</system>
+	</subSystems>
+</deploy>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<configuration status="WARN" name="${app_name}" packages="org.apache.logging.log4j.core.pattern">  
+    <properties>  
+    </properties>
+    <appenders>
+		<RollingFile name="RollingFile" fileName="${workspace}/${app_name}/logs/app.log" filePattern="${workspace}/${app_name}/logs/app-${file_pattern}">
+			<PatternLayout>
+				<Pattern>${log_pattern}</Pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB" />
+			</Policies>
+		</RollingFile>
+        
+        <!--  Kafka name="TraceLog" topic="acm">
+      		<PatternLayout pattern="%msg"/>
+			<Property name="bootstrap.servers">10.20.135.134:9092</Property>
+			<Property name="batch.size">16384</Property>
+    	</Kafka-->
+    	
+        <RollingFile name="TraceLog" fileName="${workspace}/${app_name}/logs/TraceLog.log" filePattern="${workspace}/${app_name}/logs/TraceLog-${file_pattern}">
+			<PatternLayout pattern="%msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB" />
+			</Policies>
+		</RollingFile>
+        
+        <RollingFile name="SyserrLog" fileName="${workspace}/${app_name}/logs/SyserrLog.log" filePattern="${workspace}/${app_name}/logs/SyserrLog-${file_pattern}">
+			<PatternLayout pattern="%msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB" />
+			</Policies>
+		</RollingFile>
+		
+		<RollingFile name="BizerrLog" fileName="${workspace}/${app_name}/logs/BizerrLog.log" filePattern="${workspace}/${app_name}/logs/BizerrLog-${file_pattern}">
+			<PatternLayout pattern="%msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB" />
+			</Policies>
+		</RollingFile>
+		
+		<RollingFile name="BizLog" fileName="${workspace}/${app_name}/logs/Bizlog.log" filePattern="${workspace}/${app_name}/logs/Bizlog-${file_pattern}">
+			<PatternLayout pattern="%hslog%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB" />
+			</Policies>
+		</RollingFile>
+		
+		<Async name="AsyncTraceLog">
+			<AppenderRef ref="TraceLog" />
+		</Async>
+		
+		<Async name="AsyncSyserrLog">
+			<AppenderRef ref="SyserrLog" />
+		</Async>
+		
+		<Async name="AsyncBizerrLog">
+			<AppenderRef ref="BizerrLog" />
+		</Async>
+		
+		<Async name="AsyncRollingFile">
+			<AppenderRef ref="RollingFile" />
+		</Async>
+	</appenders>
+
+	<loggers>
+		<AsyncLogger name="com.hundsun.jrescloud.common.log.trace" level="info" additivity="false">
+			<AppenderRef ref="AsyncTraceLog" />
+		</AsyncLogger>
+		
+		<AsyncLogger name="com.hundsun.jrescloud.common.log.syserr" level="info" additivity="false">
+			<AppenderRef ref="AsyncSyserrLog" />
+		</AsyncLogger>
+		
+		<AsyncLogger name="com.hundsun.jrescloud.common.log.bizerr" level="info" additivity="false">
+			<AppenderRef ref="AsyncBizerrLog" />
+		</AsyncLogger>
+		
+		<Logger name="com.hundsun.jrescloud.demo.rpc.server.service" level="info" additivity="false">
+			<AppenderRef ref="BizLog" />
+		</Logger>
+		
+		<root level="${log_level}">
+			<AppenderRef ref="AsyncRollingFile" />
+		</root>
+	</loggers>
+
+</configuration>
