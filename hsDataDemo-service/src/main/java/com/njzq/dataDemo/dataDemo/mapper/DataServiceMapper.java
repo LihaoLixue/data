@@ -22,9 +22,9 @@ public interface DataServiceMapper {
 
     void updateJobId(@Param("crop_code") String crop_code, @Param("job_id") String job_id);//刷新任务id
 
-    void updateJobState(@Param("instanceId") String crop_code, @Param("job_state") String job_state);//刷新任务状态
+    void updateJobState(@Param("instanceId") String crop_code, @Param("exec_state") String exec_state);//刷新任务状态
 
-    String getX4(@Param("instanceId") String job_id);
+    String getX4(@Param("instanceId") String instanceId);
 
 
 

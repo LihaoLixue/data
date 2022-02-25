@@ -28,15 +28,15 @@ import static com.njzq.dataDemo.dataDemo.util.HttpRequestUtil.getGeneralUrlByHtt
 public class DataServiceImpl implements IDataService {
     private static final Logger logger = LoggerFactory.getLogger(DataServiceImpl.class);
     private static final String INSTANCEID = "00120211119110345506352379";
-//    private static final String JOBKEY = "202010120008";
-    private static final int INTERVAL = 60;//任务执行间隔
+    //    private static final String JOBKEY = "202010120008";
+    private static final int INTERVAL = 120;//任务执行间隔
 
     @Autowired
     DataServiceMapper dataServiceMapper;
 
     @Override
     public Object parseJson(String json, String user_token) {
-        String return_value="";
+        String return_value = "";
         Properties prop = Configuration.getConf("./conf.properties");
         logger.info("json is " + json);
         try {
@@ -52,7 +52,7 @@ public class DataServiceImpl implements IDataService {
             String accessToken = getAccessToken();
             assignXX_only_dd(accessToken, "002968", "内评系统来了一个评级任务，请注意查看");
             if (Constant.CM02.equals(type)) {
-                String job_key= prop.getProperty("C_M02_JOBKEY");
+                String job_key = prop.getProperty("C_M02_JOBKEY");
                 //type为CM02
                 String qualFact00 = indexDict.getString(Constant.QUALFACT00);
                 //查询主体所属政府是否存在
@@ -82,15 +82,15 @@ public class DataServiceImpl implements IDataService {
                     map2.put(Constant.UNIF_SOCI_CRED_CODE, unif_soci_cred_code);
                     map2.put(Constant.PROMOTER, promoter);
                     map2.put(Constant.JOB_ID, "");
-                    map2.put(Constant.SJ,time);
-                    map2.put(Constant.GOV,qualFact00);
+                    map2.put(Constant.SJ, time);
+                    map2.put(Constant.GOV, qualFact00);
                     map2.put(Constant.DATA_STATE, Constant.ONE);//主体数据状态刷1
                     dataServiceMapper.insertSubjectInfo(map2);
                     //TODO 调用钉钉接口，发送主体所属政府不存在的信息，提醒人工处理的情况
                     String str1 = type + "敞口中主体:" + crop_code + name + "无所属政府,请手动处理-ids";
 //                    String accessToken = getAccessToken();
                     assignXX_only_dd(accessToken, "002968", str1);
-                    return_value= Constant.NOTFOUND;
+                    return_value = Constant.NOTFOUND;
                 } else {
                     logger.info("type is CM02 查询表一结果为" + result1);
                     //查询表二
@@ -119,27 +119,29 @@ public class DataServiceImpl implements IDataService {
                     map2.put(Constant.UNIF_SOCI_CRED_CODE, unif_soci_cred_code);
                     map2.put(Constant.PROMOTER, promoter);
                     map2.put(Constant.JOB_ID, "");
-                    map2.put(Constant.SJ,time);
-                    map2.put(Constant.GOV,qualFact00);
+                    map2.put(Constant.SJ, time);
+                    map2.put(Constant.GOV, qualFact00);
                     map2.put(Constant.DATA_STATE, Constant.ZERO);//主体数据状态刷0
                     dataServiceMapper.insertSubjectInfo(map2);
                     //执行后续逻辑
-                    excuteTask(crop_code,job_key,user_token,prop);
-                    return_value= Constant.FOUND;
+                    String str1 = type + "敞口中主体:" + crop_code + name + "无所属政府,请手动处理-ids";
+//                    String accessToken = getAccessToken();
+                    assignXX_only_dd(accessToken, "002968", str1);
+                    excuteTask(crop_code, job_key, user_token, prop);
+                    return_value = Constant.FOUND;
                 }
-            } else if(Constant.CM03.equals(type)){
-                String job_key= prop.getProperty("C_M03_JOBKEY");
-                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict,job_key);
-                return_value= Constant.FOUND;
-            }else if(Constant.CM04.equals(type)){
-                String job_key= prop.getProperty("C_M04_JOBKEY");
-                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict,job_key);
-                return_value= Constant.FOUND;
-            }
-            else if(Constant.CM21.equals(type)){
-                String job_key= prop.getProperty("C_M21_JOBKEY");
-                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict,job_key);
-                return_value= Constant.FOUND;
+            } else if (Constant.CM03.equals(type)) {
+                String job_key = prop.getProperty("C_M03_JOBKEY");
+                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key);
+                return_value = Constant.FOUND;
+            } else if (Constant.CM04.equals(type)) {
+                String job_key = prop.getProperty("C_M04_JOBKEY");
+                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key);
+                return_value = Constant.FOUND;
+            } else if (Constant.CM21.equals(type)) {
+                String job_key = prop.getProperty("C_M21_JOBKEY");
+                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key);
+                return_value = Constant.FOUND;
             }//TODO 继续增加其他敞口类型的逻辑
             return return_value;
         } catch (Exception e) {
@@ -148,7 +150,7 @@ public class DataServiceImpl implements IDataService {
         }
     }
 
-    private void excuteJudgeAndJob(String user_token, Properties prop, String type, String name, String crop_code, String promoter, String unif_soci_cred_code, String date, JSONObject indexDict,String job_key) {
+    private void excuteJudgeAndJob(String user_token, Properties prop, String type, String name, String crop_code, String promoter, String unif_soci_cred_code, String date, JSONObject indexDict, String job_key) {
         logger.info("type is not CM02");
         //type不为CM02
         //刷表
@@ -177,10 +179,10 @@ public class DataServiceImpl implements IDataService {
         map2.put(Constant.DATA_STATE, Constant.ZERO);//主体数据状态刷0
         dataServiceMapper.insertSubjectInfo(map2);
         //执行后续逻辑
-        excuteTask(crop_code,job_key,user_token,prop);
+        excuteTask(crop_code, job_key, user_token, prop);
     }
 
-    private void excuteTask(String crop_code,String job_key,String user_token,Properties prop) {
+    private void excuteTask(String crop_code, String job_key, String user_token, Properties prop) {
         ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         scheduledExecutorService.scheduleAtFixedRate(() -> {
             String taskResult = dataServiceMapper.getX3();
@@ -188,16 +190,16 @@ public class DataServiceImpl implements IDataService {
                 //结束流程调度
                 scheduledExecutorService.shutdownNow();
                 //执行后续逻辑，获取任务id
-                String instanceId = getJobId(job_key,user_token,prop);
+                String instanceId = getJobId(job_key, user_token, prop);
                 //根据crop_code 刷新 job_id
                 dataServiceMapper.updateJobId(crop_code, instanceId);
                 //循环查询任务状态情况
-                executeState(instanceId,user_token,prop);
+                executeState(instanceId, user_token, prop);
             }
         }, 0, INTERVAL, TimeUnit.SECONDS);
     }
 
-    private String getJobId(String job_key,String user_token,Properties prop) {
+    private String getJobId(String job_key, String user_token, Properties prop) {
         Map<String, String> params = new HashMap<String, String>();
         params.put(Constant.SYSTEMID, prop.getProperty("SYSTEMID"));
         params.put(Constant.COMPANYID, prop.getProperty("COMPANYID"));
@@ -206,11 +208,10 @@ public class DataServiceImpl implements IDataService {
         params.put(Constant.ISAUTO, prop.getProperty("ISAUTO"));
         JSONObject jb = JSONObject.fromObject(params);
         logger.info("getJobId param:" + jb.toString());
-
-        String queryUrl = prop.getProperty("SUBMIT_JOB","http://173.2.51.42:8088/scheduler/scheduler/1.0/executeJobReturnInstanceId");
+        String queryUrl = prop.getProperty("SUBMIT_JOB", "http://173.2.51.42:8088/scheduler/scheduler/1.0/executeJobReturnInstanceId");
         String result = "";
         try {
-            result = HttpRequestUtil.post(queryUrl, jb.toString(),user_token);
+            result = HttpRequestUtil.post(queryUrl, jb.toString(), user_token);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -221,7 +222,7 @@ public class DataServiceImpl implements IDataService {
         return data.getString("result");
     }
 
-    private void executeState(String instanceId,String user_token,Properties prop) {
+    private void executeState(String instanceId, String user_token, Properties prop) {
 
         ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         scheduledExecutorService.scheduleAtFixedRate(() -> {
@@ -230,24 +231,28 @@ public class DataServiceImpl implements IDataService {
                 params.put(Constant.INSTANCEID, instanceId);
                 JSONObject jb = JSONObject.fromObject(params);
                 logger.info("executeState param:" + jb.toString());
-                String queryUrl = prop.getProperty("CHECK_JOB_STATE","http://173.2.51.42:8088/scheduler/scheduler/1.0/getExeMonitorInfoByInstanceId");
+                String queryUrl = prop.getProperty("CHECK_JOB_STATE", "http://173.2.51.42:8088/scheduler/scheduler/1.0/getExeMonitorInfoByInstanceId");
                 String result = "";
                 try {
-                    result = HttpRequestUtil.post(queryUrl, jb.toString(),user_token);
+                    result = HttpRequestUtil.post(queryUrl, jb.toString(), user_token);
                 } catch (Exception e) {
                     logger.error(e.getMessage());
                 }
 //                logger.info("executeState result:" + result);
                 JSONObject resultJson = JSONObject.fromObject(result);
                 JSONArray datas = resultJson.getJSONArray("data");
-                JSONObject data = datas.getJSONObject(0);
-                String exec_state = data.getString("exec_state");
-                String end_time = data.getString("end_time");
+                String data = datas.getJSONObject(0).toString();
+                JSONObject jsonObject = JSONObject.fromObject(data);
+                String exec_state = jsonObject.getString("exec_state");
+                logger.error("exec_state is {}",exec_state);
                 dataServiceMapper.updateJobState(instanceId, exec_state);
                 if (Constant.EXEC_SUCCESS.equals(exec_state)) {
                     scheduledExecutorService.shutdownNow();
+                    logger.error("instanceId is {}",instanceId);
                     String x4 = dataServiceMapper.getX4(instanceId);
-                    getGeneralUrlByHttps(x4);
+                    logger.error("instanceId2222 is {}",x4);
+                    String generalUrlByHttps = getGeneralUrlByHttps(x4);
+                    logger.error("555888888 {}",generalUrlByHttps);
                 } else if (Constant.EXPECT_END.equals(exec_state) ||
                         Constant.WAIT_OUT.equals(exec_state) ||
                         Constant.EXEC_FAILE.equals(exec_state) ||
@@ -255,33 +260,34 @@ public class DataServiceImpl implements IDataService {
                         Constant.EXEC_FAILE.equals(exec_state)
                 ) {
                     scheduledExecutorService.shutdownNow();
-                    executeStop(instanceId,user_token,prop);  //停止并发送信息
+                    executeStop(instanceId, user_token, prop);  //停止并发送信息
                     logger.error("出现异常，发送钉钉");
                     //TODO 调用强制停止接口
                 }
-            } catch (Throwable t) {
+            } catch (Exception t) {
+                System.out.println(t);
                 t.printStackTrace();
                 logger.error("executeState scheduleAtFixedRate error: " + t.toString());
             }
 
-        }, 0, 20, TimeUnit.SECONDS);
+        }, 0, INTERVAL, TimeUnit.SECONDS);
 
     }
 
     //强制停止接口
-    private void executeStop(String instanceId,String user_token,Properties prop) {
+    private void executeStop(String instanceId, String user_token, Properties prop) {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put(Constant.INSTANCEID, instanceId);
         JSONObject jb = JSONObject.fromObject(params);
         logger.info("executeState param:" + jb.toString());
-        String queryUrl = prop.getProperty("FORCE_KILL","http://173.2.51.42:8088/scheduler/scheduler/1.0/instanceStop");
+        String queryUrl = prop.getProperty("FORCE_KILL", "http://173.2.51.42:8088/scheduler/scheduler/1.0/instanceStop");
         String result = "";
         try {
-            result = HttpRequestUtil.post(queryUrl, jb.toString(),user_token);
+            result = HttpRequestUtil.post(queryUrl, jb.toString(), user_token);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-        logger.error("任务强制成功,任务id为：{}",instanceId);
+        logger.error("任务强制成功,任务id为：{}", instanceId);
     }
 }
