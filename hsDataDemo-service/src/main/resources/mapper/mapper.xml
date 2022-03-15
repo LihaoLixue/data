@@ -5,12 +5,12 @@
 <mapper namespace="com.njzq.dataDemo.dataDemo.mapper.DataServiceMapper">
     <select id="getX1" resultType="String">
         select case when count(1) >=1 then '0' when count(1)=0 then '1' end
-        from deloitte.data_gov_grade where gov_code=#{qualFact00};
+        from deloitte.data_gov_grade t,deloitte.dm_fin_gov_scor t2 where t.gov_code=t2.gov_code and t.gov_code=#{qualFact00};
 
     </select>
 
     <select id="getX2" resultType="String">
-        select ifnull(gov_tot_scor,-50) as score from deloitte.dm_fin_gov_scor t2
+        select ifnull(max(gov_tot_scor),-50) as score from deloitte.dm_fin_gov_scor t2
         where t2.gov_code=#{qualFact00} and t2.data_year=(select max(data_year) from deloitte.dm_fin_gov_scor where gov_code=#{qualFact00})
 
     </select>

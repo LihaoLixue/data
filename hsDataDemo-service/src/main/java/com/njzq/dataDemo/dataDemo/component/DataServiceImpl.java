@@ -9,6 +9,7 @@ import com.njzq.dataDemo.dataDemo.util.SendMessageIn;
 import com.njzq.dataDemo.service.IDataService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.omg.DynamicAny._DynValueStub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class DataServiceImpl implements IDataService {
             String time = jsonObject.getString(Constant.TIME);
             JSONObject indexDict = jsonObject.getJSONObject(Constant.INDEX_DICT);
             String accessToken = getAccessToken();
-            assignXX_only_dd(accessToken, "002968", "内评系统来了一个评级任务，请注意查看");
+            assignXX_only_dd(accessToken, "002968,003067", "内评系统来了一个评级任务,行业为："+type+"，请注意查看");
             if (Constant.CM02.equals(type)) {
                 String job_key = prop.getProperty("C_M02_JOBKEY");
                 //type为CM02
@@ -89,7 +90,7 @@ public class DataServiceImpl implements IDataService {
                     //TODO 调用钉钉接口，发送主体所属政府不存在的信息，提醒人工处理的情况
                     String str1 = type + "敞口中主体:" + crop_code + name + "无所属政府,请手动处理-ids";
 //                    String accessToken = getAccessToken();
-                    assignXX_only_dd(accessToken, "002968", str1);
+                    assignXX_only_dd(accessToken, "002968,003067", str1);
                     return_value = Constant.NOTFOUND;
                 } else {
                     logger.info("type is CM02 查询表一结果为" + result1);
@@ -124,9 +125,9 @@ public class DataServiceImpl implements IDataService {
                     map2.put(Constant.DATA_STATE, Constant.ZERO);//主体数据状态刷0
                     dataServiceMapper.insertSubjectInfo(map2);
                     //执行后续逻辑
-                    String str1 = type + "敞口中主体:" + crop_code + name + "无所属政府,请手动处理-ids";
+                    String str1 = type + "敞口中主体:" + crop_code + name + "请注意查看-ids";
 //                    String accessToken = getAccessToken();
-                    assignXX_only_dd(accessToken, "002968", str1);
+                    assignXX_only_dd(accessToken, "002968,003067", str1);
                     excuteTask(crop_code, job_key, user_token, prop);
                     return_value = Constant.FOUND;
                 }
@@ -142,7 +143,15 @@ public class DataServiceImpl implements IDataService {
                 String job_key = prop.getProperty("C_M21_JOBKEY");
                 excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key);
                 return_value = Constant.FOUND;
-            }//TODO 继续增加其他敞口类型的逻辑
+            } else if (type.startsWith("C_M")){
+                String str1 = type + "敞口中主体:" + crop_code + name + "除城投敞口外的行业-ids";
+//                    String accessToken = getAccessToken();
+                assignXX_only_dd(accessToken, "002968,003067", str1);
+                String job_key = "11111";
+                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key);
+                return_value = Constant.FOUND;
+            }
+            //TODO 继续增加其他敞口类型的逻辑
             return return_value;
         } catch (Exception e) {
             logger.error("parse json error " + e);
@@ -263,6 +272,8 @@ public class DataServiceImpl implements IDataService {
                     executeStop(instanceId, user_token, prop);  //停止并发送信息
                     logger.error("出现异常，发送钉钉");
                     //TODO 调用强制停止接口
+                }else if(Constant.FORCE_TERM.equals(exec_state)){
+                    scheduledExecutorService.shutdownNow();
                 }
             } catch (Exception t) {
                 System.out.println(t);

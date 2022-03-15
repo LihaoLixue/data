@@ -473,7 +473,7 @@ public class HttpRequestUtil {
             String company_no = "11780";
             String name = split[3];
             String crop_code = split[2];
-            String methodUrl = "http://173.2.32.10:8089/Artemis/rest/crk/subjectcredit/OrgIndexDQResource?type=" + type + "&date=" + date + "&time=" + time + "&company_no=" + company_no + "&name=" + name + "&crop_code=" + crop_code;
+            String methodUrl = "http://173.2.33.42:8089/Artemis/rest/crk/subjectcredit/OrgIndexDQResource?type=" + type + "&date=" + date + "&time=" + time + "&company_no=" + company_no + "&name=" + name + "&crop_code=" + crop_code;
 //            URIBuilder uri = new URIBuilder(methodUrl);
 //            logger.error("params1111 is {}, {},{},{},{}",type,date,time,company_no,name,crop_code);
 ////            BasicNameValuePair param1 = new BasicNameValuePair("type", type);
