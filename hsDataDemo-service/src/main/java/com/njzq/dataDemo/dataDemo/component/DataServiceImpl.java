@@ -51,7 +51,7 @@ public class DataServiceImpl implements IDataService {
             String time = jsonObject.getString(Constant.TIME);
             JSONObject indexDict = jsonObject.getJSONObject(Constant.INDEX_DICT);
             String accessToken = getAccessToken();
-            assignXX_only_dd(accessToken, "002968,003067", "内评系统来了一个评级任务,行业为："+type+"，请注意查看");
+            assignXX_only_dd(accessToken, "002968,003185", "内评系统来了一个评级任务,行业为："+type+"，请注意查看");
             if (Constant.CM02.equals(type)) {
                 String job_key = prop.getProperty("C_M02_JOBKEY");
                 //type为CM02
@@ -127,28 +127,28 @@ public class DataServiceImpl implements IDataService {
                     //执行后续逻辑
                     String str1 = type + "敞口中主体:" + crop_code + name + "请注意查看-ids";
 //                    String accessToken = getAccessToken();
-                    assignXX_only_dd(accessToken, "002968,003067", str1);
+                    assignXX_only_dd(accessToken, "003067,002968", str1);
                     excuteTask(crop_code, job_key, user_token, prop);
                     return_value = Constant.FOUND;
                 }
             } else if (Constant.CM03.equals(type)) {
                 String job_key = prop.getProperty("C_M03_JOBKEY");
-                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key);
+                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key,time);
                 return_value = Constant.FOUND;
             } else if (Constant.CM04.equals(type)) {
                 String job_key = prop.getProperty("C_M04_JOBKEY");
-                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key);
+                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key,time);
                 return_value = Constant.FOUND;
             } else if (Constant.CM21.equals(type)) {
                 String job_key = prop.getProperty("C_M21_JOBKEY");
-                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key);
+                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key,time);
                 return_value = Constant.FOUND;
             } else if (type.startsWith("C_M")){
-                String str1 = type + "敞口中主体:" + crop_code + name + "除城投敞口外的行业-ids";
+                String str1 = type + "敞口中主体:" + crop_code + name + "为除城投敞口外的行业-ids";
 //                    String accessToken = getAccessToken();
-                assignXX_only_dd(accessToken, "002968,003067", str1);
+                assignXX_only_dd(accessToken, "003067,002968", str1);
                 String job_key = "11111";
-                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key);
+                excuteJudgeAndJob(user_token, prop, type, name, crop_code, promoter, unif_soci_cred_code, date, indexDict, job_key,time);
                 return_value = Constant.FOUND;
             }
             //TODO 继续增加其他敞口类型的逻辑
@@ -159,7 +159,7 @@ public class DataServiceImpl implements IDataService {
         }
     }
 
-    private void excuteJudgeAndJob(String user_token, Properties prop, String type, String name, String crop_code, String promoter, String unif_soci_cred_code, String date, JSONObject indexDict, String job_key) {
+    private void excuteJudgeAndJob(String user_token, Properties prop, String type, String name, String crop_code, String promoter, String unif_soci_cred_code, String date, JSONObject indexDict, String job_key,String time) {
         logger.info("type is not CM02");
         //type不为CM02
         //刷表
@@ -185,6 +185,7 @@ public class DataServiceImpl implements IDataService {
         map2.put(Constant.UNIF_SOCI_CRED_CODE, unif_soci_cred_code);
         map2.put(Constant.PROMOTER, promoter);
         map2.put(Constant.JOB_ID, "");
+        map2.put(Constant.SJ, time);
         map2.put(Constant.DATA_STATE, Constant.ZERO);//主体数据状态刷0
         dataServiceMapper.insertSubjectInfo(map2);
         //执行后续逻辑
@@ -192,6 +193,7 @@ public class DataServiceImpl implements IDataService {
     }
 
     private void excuteTask(String crop_code, String job_key, String user_token, Properties prop) {
+        logger.info("进入到excuteTask方法");
         ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         scheduledExecutorService.scheduleAtFixedRate(() -> {
             String taskResult = dataServiceMapper.getX3();
@@ -209,6 +211,7 @@ public class DataServiceImpl implements IDataService {
     }
 
     private String getJobId(String job_key, String user_token, Properties prop) {
+        logger.info("进入调用方法");
         Map<String, String> params = new HashMap<String, String>();
         params.put(Constant.SYSTEMID, prop.getProperty("SYSTEMID"));
         params.put(Constant.COMPANYID, prop.getProperty("COMPANYID"));
@@ -217,7 +220,7 @@ public class DataServiceImpl implements IDataService {
         params.put(Constant.ISAUTO, prop.getProperty("ISAUTO"));
         JSONObject jb = JSONObject.fromObject(params);
         logger.info("getJobId param:" + jb.toString());
-        String queryUrl = prop.getProperty("SUBMIT_JOB", "http://173.2.51.42:8088/scheduler/scheduler/1.0/executeJobReturnInstanceId");
+        String queryUrl = prop.getProperty("SUBMIT_JOB", "http://173.2.52.12:8088/scheduler/scheduler/1.0/executeJobReturnInstanceId");
         String result = "";
         try {
             result = HttpRequestUtil.post(queryUrl, jb.toString(), user_token);
@@ -271,6 +274,8 @@ public class DataServiceImpl implements IDataService {
                     scheduledExecutorService.shutdownNow();
                     executeStop(instanceId, user_token, prop);  //停止并发送信息
                     logger.error("出现异常，发送钉钉");
+                    String accessToken = getAccessToken();
+                    assignXX_only_dd(accessToken, "003067,002968", "单主体评级流程出现异常，请到数据中台查看具体信息-ids！！！");
                     //TODO 调用强制停止接口
                 }else if(Constant.FORCE_TERM.equals(exec_state)){
                     scheduledExecutorService.shutdownNow();

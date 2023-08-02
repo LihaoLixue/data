@@ -180,67 +180,8 @@ public class DingTalkService {
         }
     }
 
-    /**
-     * @description: 推送消息
-     * @param in
-     * @return: void
-     * @author: zxq
-     * @Date: 2020/11/26 13:28
-     */
-    public static void sendMessage(SendMessageIn in) throws Exception {
-        log.info("开始推送钉钉消息：" + in);
-        in.setWebhook("https://oapi.dingtalk.com/robot/send?access_token=45f1cccf08d2e7b471ce66412a719d210e366ca562fdb4763aa5c8e011fea8d8");
-        in.setSecret("签");
-        Long timestamp = System.currentTimeMillis();
-        String secret = in.getSecret();
 
-        String stringToSign = timestamp + "\n" + secret;
-        Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"));
-        byte[] signData = mac.doFinal(stringToSign.getBytes("UTF-8"));
-        String sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)), "UTF-8");
 
-        DingTalkClient client = new DefaultDingTalkClient(in.getWebhook() + "&timestamp=" + timestamp + "&sign=" + sign);
-        OapiRobotSendRequest request = new OapiRobotSendRequest();
-
-        OapiRobotSendRequest.At at = new OapiRobotSendRequest.At();
-        if (in.isAtAll() || in.getMobileList() == null || in.getMobileList().size() == 0) {
-            //推送所有人
-            at.setIsAtAll(true);
-        } else {
-            //推送指定用户
-            at.setAtMobiles(in.getMobileList());
-            at.setIsAtAll(false);
-        }
-        request.setAt(at);
-
-        //文本消息
-        if (TEXT.equals(in.getMsgType())) {
-//            request.setMsgtype(BDic.DING_TALK_MSG_TYPE.TEXT);
-            request.setMsgtype(TEXT);
-            OapiRobotSendRequest.Text text = new OapiRobotSendRequest.Text();
-            text.setContent(in.getText());
-            request.setText(text);
-        }
-
-        OapiRobotSendResponse response = client.execute(request);
-        log.info("钉钉推送返回结果：" + response);
-
-    }
-
-    public static void main(String[] args) throws Exception {
-
-//        List<String> mobileList = new ArrayList<>();
-//        mobileList.add("156xxxxxxxx");
-
-        SendMessageIn in = new SendMessageIn();
-        in.setMsgType(TEXT);
-        in.setAtAll(false);
-//        in.setMobileList(mobileList);
-        in.setText("ids桃花坞里桃花庵，桃花庵下桃花仙");
-        sendMessage(in);
-
-    }
 
 
 

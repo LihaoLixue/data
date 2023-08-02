@@ -9,7 +9,7 @@
 		<appType describe="服务标识">hsDataDemo-service</appType>
 		<appName describe="服务别名">德勤主体数据缺失需求</appName> <!--应用名称-->
 		<appDescribe describe="发布包说明">德勤主体数据缺失需求发布包</appDescribe> <!--发布物描述-->
-		<version describe="发布包版本">1.2-Alpha-20211116</version> <!--应用、发布物版本-->
+		<version describe="发布包版本">1.4-Alpha-20211116</version> <!--应用、发布物版本-->
 		<packInEffect describe="影响的主包（只有补丁需要配置，填写主包的版本号）"></packInEffect>
 	</basic>
 

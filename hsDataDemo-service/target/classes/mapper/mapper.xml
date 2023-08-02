@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.njzq.dataDemo.dataDemo.mapper.DataServiceMapper">
+    <select id="getX1" resultType="String">
+        select case when count(1) >=1 then '0' when count(1)=0 then '1' end
+        from deloitte.data_gov_grade t,deloitte.dm_fin_gov_scor t2 where t.gov_code=t2.gov_code and t.gov_code=#{qualFact00};
+
+    </select>
+
+    <select id="getX2" resultType="String">
+        select ifnull(max(gov_tot_scor),-50) as score from deloitte.dm_fin_gov_scor t2
+        where t2.gov_code=#{qualFact00} and t2.data_year=(select max(data_year) from deloitte.dm_fin_gov_scor where gov_code=#{qualFact00})
+
+    </select>
+
+    <select id="getX3" resultType="String">
+        select count(1) from deloitte.job_data t where t.`type`='C_M02' and t.job_state  not in ('2','7')
+    </select>
+
+    <insert id="insertIndicatorDetail" parameterType="map">
+        insert into job_deta_data (`type` ,crop_code ,`index` ,value ,`date` ,data_state )
+        values(#{type},#{crop_code},#{index_dict},#{value},#{date},#{data_state})
+    </insert>
+    <insert id="insertSubjectInfo" parameterType="map">
+        insert into job_data
+        (`type` ,crop_code ,crop_name ,unif_soci_cred_code ,promoter ,job_id  ,data_state,sj,gov )
+        values(#{type},#{crop_code},#{name},#{unif_soci_cred_code},#{promoter},#{job_id},#{data_state},#{sj},#{gov})
+    </insert>
+    <update id="updateJobId" parameterType="String">
+        update job_data set job_id = #{job_id} where crop_code = #{crop_code}
+    </update>
+
+    <update id="updateJobState" parameterType="String">
+        update job_data set job_state = #{exec_state} where job_id = #{instanceId}
+    </update>
+
+    <select id="getX4" resultType="String">
+        select concat(t.type,'-',t1.date,'-',t.crop_code,'-',t.crop_name) from deloitte.job_data t, job_deta_data t1 where t1.crop_code=t.crop_code and t.job_id= #{instanceId} limit 1
+    </select>
+</mapper>

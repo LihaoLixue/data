@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="module">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Desktop/module/ams-server-common-1.0.0.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/module/ams-server-module-accountAnalysis-1.0.0.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/module/ams-server-module-baseInformation-1.0.0.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/module/ams-server-module-commonService-1.0.0.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/module/ams-server-module-financeInformation-1.0.0.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/module/ams-server-module-historyInquiry-1.0.0.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/module/ams-server-module-log-1.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

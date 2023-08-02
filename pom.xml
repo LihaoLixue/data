@@ -21,17 +21,69 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jdbc</artifactId>
+            </dependency>
+            <dependency>
                 <groupId>com.hundsun.jrescloud</groupId>
                 <artifactId>jrescloud-dependencies</artifactId>
                 <version>2.0.25</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.20</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.mybatis.generator</groupId>
+                <artifactId>mybatis-generator-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>5.1.47</version>
+                    </dependency>
+                </dependencies>
+                <!--                指定配置文件的路径-->
+                <configuration>
+                    <configurationFile>${project.basedir}/src/main/resources/generatorConfig.xml</configurationFile>
+                    <verbose>true</verbose>
+                    <overwrite>true</overwrite>
+                </configuration>
+            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.springframework.experimental</groupId>-->
+<!--                <artifactId>spring-aot-maven-plugin</artifactId>-->
+<!--                <version>${spring-native.version}</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>test-generate</id>-->
+<!--                        <goals>-->
+<!--                            <goal>test-generate</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>generate</id>-->
+<!--                        <goals>-->
+<!--                            <goal>generate</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
@@ -54,10 +106,10 @@
         <!--        service模块生成的jar包名-->
         <service_jar_name>hsDataDemo-service</service_jar_name>
         <!--        service模块生成的jar包版本-->
-        <service_jar_version>1.2-Alpha</service_jar_version>
+        <service_jar_version>1.4-Alpha</service_jar_version>
         <!--        zip模块生成的jar包名-->
         <service_zip_jar_name>hsDataDemo-zip</service_zip_jar_name>
         <!--        zip模块生成的jar包版本-->
-        <zip_jar_version>1.2-Alpha</zip_jar_version>
+        <zip_jar_version>1.4-Alpha</zip_jar_version>
     </properties>
 </project>
